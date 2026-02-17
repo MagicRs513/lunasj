@@ -18,7 +18,11 @@ export async function getAdminConfig(): Promise<AdminConfig | null> {
   if (rows.length === 0) return null;
 
   try {
-    return JSON.parse(rows[0].config_value) as AdminConfig;
+    const configValue = rows[0].config_value;
+    if (typeof configValue === 'string') {
+      return JSON.parse(configValue) as AdminConfig;
+    }
+    return configValue as unknown as AdminConfig;
   } catch (error) {
     console.error('[MySQL] Failed to parse admin config:', error);
     return null;

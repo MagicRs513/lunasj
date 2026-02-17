@@ -877,18 +877,19 @@ export class HybridStorage implements IStorage {
     const cardKey = cardKeys.find((ck) => ck.key_hash === activeKey.key_hash);
 
     const now = Date.now();
+    const expiresAtTime = activeKey.expires_at.getTime();
     const daysRemaining = Math.max(
       0,
-      Math.ceil((activeKey.expires_at - now) / (1000 * 60 * 60 * 24)),
+      Math.ceil((expiresAtTime - now) / (1000 * 60 * 60 * 24)),
     );
-    const isExpired = activeKey.expires_at < now;
+    const isExpired = expiresAtTime < now;
     const isExpiring = !isExpired && daysRemaining <= 30;
 
     return {
       plainKey: cardKey?.plain_key || undefined, // 从 card_keys 表获取明文
       boundKey: activeKey.key_hash,
-      expiresAt: new Date(activeKey.expires_at).getTime(),
-      boundAt: new Date(activeKey.created_at).getTime(),
+      expiresAt: expiresAtTime,
+      boundAt: activeKey.created_at.getTime(),
       daysRemaining,
       isExpiring,
       isExpired,

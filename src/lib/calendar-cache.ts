@@ -57,8 +57,12 @@ export class CalendarCacheManager {
         } else {
           throw new Error('Upstash存储没有可用的set方法');
         }
-      } else if (storageType === 'kvrocks' || storageType === 'redis') {
-        // KVRocks/标准Redis
+      } else if (
+        storageType === 'kvrocks' ||
+        storageType === 'redis' ||
+        storageType === 'mysql-redis'
+      ) {
+        // KVRocks/标准Redis/MySQL-Redis
         if (storage.withRetry && storage.client?.set) {
           await storage.withRetry(() =>
             storage.client.set(CALENDAR_DATA_KEY, dataStr),
@@ -70,7 +74,7 @@ export class CalendarCacheManager {
           await storage.client.set(CALENDAR_DATA_KEY, dataStr);
           await storage.client.set(CALENDAR_TIME_KEY, timestamp);
         } else {
-          throw new Error('KVRocks/Redis存储没有可用的set方法');
+          throw new Error('Redis存储没有可用的set方法');
         }
       } else {
         throw new Error(`不支持的存储类型: ${storageType}`);
@@ -114,8 +118,12 @@ export class CalendarCacheManager {
         } else {
           throw new Error('Upstash存储没有可用的get方法');
         }
-      } else if (storageType === 'kvrocks' || storageType === 'redis') {
-        // KVRocks/标准Redis
+      } else if (
+        storageType === 'kvrocks' ||
+        storageType === 'redis' ||
+        storageType === 'mysql-redis'
+      ) {
+        // KVRocks/标准Redis/MySQL-Redis
         if (storage.withRetry && storage.client?.get) {
           dataStr = await storage.withRetry(() =>
             storage.client.get(CALENDAR_DATA_KEY),
@@ -127,7 +135,7 @@ export class CalendarCacheManager {
           dataStr = await storage.client.get(CALENDAR_DATA_KEY);
           timeStr = await storage.client.get(CALENDAR_TIME_KEY);
         } else {
-          throw new Error('KVRocks/Redis存储没有可用的get方法');
+          throw new Error('Redis存储没有可用的get方法');
         }
       } else {
         throw new Error(`不支持的存储类型: ${storageType}`);
@@ -162,7 +170,7 @@ export class CalendarCacheManager {
           return null;
         }
       } else {
-        // KVRocks/Redis 正常处理：总是返回字符串
+        // KVRocks/Redis/MySQL-Redis 正常处理：总是返回字符串
         data = JSON.parse(dataStr);
       }
 
@@ -200,7 +208,11 @@ export class CalendarCacheManager {
           await storage.del(CALENDAR_DATA_KEY);
           await storage.del(CALENDAR_TIME_KEY);
         }
-      } else if (storageType === 'kvrocks' || storageType === 'redis') {
+      } else if (
+        storageType === 'kvrocks' ||
+        storageType === 'redis' ||
+        storageType === 'mysql-redis'
+      ) {
         if (storage.withRetry && storage.client?.del) {
           await storage.withRetry(() => storage.client.del(CALENDAR_DATA_KEY));
           await storage.withRetry(() => storage.client.del(CALENDAR_TIME_KEY));
@@ -238,7 +250,12 @@ export class CalendarCacheManager {
         } else if (storage.get) {
           timeStr = await storage.get(CALENDAR_TIME_KEY);
         }
-      } else if (storageType === 'kvrocks' || storageType === 'redis') {
+      } else if (
+        storageType === 'kvrocks' ||
+        storageType === 'redis' ||
+        storageType === 'mysql-redis'
+      ) {
+        // KVRocks/标准Redis/MySQL-Redis
         if (storage.withRetry && storage.client?.get) {
           timeStr = await storage.withRetry(() =>
             storage.client.get(CALENDAR_TIME_KEY),

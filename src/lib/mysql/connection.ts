@@ -98,8 +98,10 @@ export async function executeQuery<T = Record<string, unknown>>(
 ): Promise<T[]> {
   const pool = getMysqlPool();
   try {
+    const connection = await pool.getConnection();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [rows] = (await pool.execute(sql, params)) as any;
+    const [rows] = (await connection.execute(sql, params)) as any;
+    connection.release();
     return rows as T[];
   } catch (error) {
     console.error('[MySQL] Query failed:', sql);
@@ -115,7 +117,9 @@ export async function executeUpdate(
 ): Promise<{ affectedRows: number; insertId: number }> {
   const pool = getMysqlPool();
   try {
-    const [result] = await pool.execute(sql, params);
+    const connection = await pool.getConnection();
+    const [result] = await connection.execute(sql, params);
+    connection.release();
     return {
       affectedRows: (result as { affectedRows: number }).affectedRows,
       insertId: (result as { insertId: number }).insertId,

@@ -306,7 +306,6 @@ export class HybridStorage implements IStorage {
       if (!userExists) {
         config.UserConfig.Users.push({
           username: userName,
-          password: '',
           role: 'user',
           banned: false,
           tags: undefined,

@@ -100,15 +100,21 @@ export class DatabaseCacheManager {
           console.error('❌ Upstash键获取失败:', error);
           return null;
         }
-      } else if (storageType === 'kvrocks' || storageType === 'redis') {
-        // KVRocks/标准Redis (带重试机制) - 保持不变
-        console.log('🔍 使用KVRocks/标准Redis方式获取键...');
+      } else if (
+        storageType === 'kvrocks' ||
+        storageType === 'redis' ||
+        storageType === 'mysql-redis'
+      ) {
+        // KVRocks/标准Redis/MySQL-Redis (带重试机制) - 保持不变
+        console.log('🔍 使用KVRocks/标准Redis/MySQL-Redis方式获取键...');
         if (typeof storage.withRetry === 'function' && storage.client?.keys) {
           allCacheKeys = await storage.withRetry(() =>
             storage.client.keys('cache:*'),
           );
         } else {
-          console.warn('❌ KVRocks/Redis存储没有withRetry或client.keys方法');
+          console.warn(
+            '❌ KVRocks/Redis/MySQL-Redis存储没有withRetry或client.keys方法',
+          );
           return null;
         }
       } else {
@@ -169,14 +175,18 @@ export class DatabaseCacheManager {
           console.error('❌ Upstash批量获取失败:', error);
           return null;
         }
-      } else if (storageType === 'kvrocks' || storageType === 'redis') {
-        // KVRocks/标准Redis (带重试机制) - 保持不变
+      } else if (
+        storageType === 'kvrocks' ||
+        storageType === 'redis' ||
+        storageType === 'mysql-redis'
+      ) {
+        // KVRocks/标准Redis/MySQL-Redis (带重试机制) - 保持不变
         if (typeof storage.withRetry === 'function' && storage.client?.mGet) {
           values = await storage.withRetry(() =>
             storage.client.mGet(allCacheKeys),
           );
         } else {
-          console.warn('KVRocks/Redis没有mGet方法，使用逐个获取');
+          console.warn('KVRocks/Redis/MySQL-Redis没有mGet方法，使用逐个获取');
           // 回退：逐个获取
           for (const key of allCacheKeys) {
             try {

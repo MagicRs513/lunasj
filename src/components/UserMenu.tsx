@@ -40,7 +40,7 @@ import {
   forceRefreshPlayRecordsCache,
   type PlayRecord,
 } from '@/lib/db.client';
-import type { Favorite } from '@/lib/types';
+import type { Favorite, UserCardKeyInfo } from '@/lib/types';
 
 import { VersionPanel } from './VersionPanel';
 import VideoCard from './VideoCard';
@@ -79,6 +79,7 @@ export const UserMenu: React.FC = () => {
   );
   const [hasUnreadUpdates, setHasUnreadUpdates] = useState(false);
   const [showWatchRoom, setShowWatchRoom] = useState(false);
+  const [cardKeyInfo, setCardKeyInfo] = useState<UserCardKeyInfo | null>(null);
 
   // Body 滚动锁定 - 使用 overflow 方式避免布局问题
   useEffect(() => {
@@ -240,6 +241,23 @@ export const UserMenu: React.FC = () => {
       const auth = getAuthInfoFromBrowserCookie();
       setAuthInfo(auth);
     }
+  }, []);
+
+  // 获取用户卡密信息
+  useEffect(() => {
+    const fetchCardKeyInfo = async () => {
+      try {
+        const res = await fetch('/api/user/cardkey');
+        if (res.ok) {
+          const data = await res.json();
+          setCardKeyInfo(data.cardKeyInfo || null);
+        }
+      } catch (error) {
+        console.error('获取卡密信息失败:', error);
+      }
+    };
+
+    fetchCardKeyInfo();
   }, []);
 
   // 检查观影室功能是否启用
@@ -1173,6 +1191,27 @@ export const UserMenu: React.FC = () => {
                 {storageType === 'localstorage' ? '本地' : storageType}
               </div>
             </div>
+            {/* 卡密到期日期 */}
+            {cardKeyInfo && (
+              <div className='flex items-center justify-between pt-1'>
+                <span className='text-[10px] text-gray-500 dark:text-gray-400'>
+                  卡密到期：
+                </span>
+                <span
+                  className={`text-[10px] font-medium ${
+                    cardKeyInfo.isExpired
+                      ? 'text-red-600 dark:text-red-400'
+                      : cardKeyInfo.isExpiring
+                        ? 'text-yellow-600 dark:text-yellow-400'
+                        : 'text-green-600 dark:text-green-400'
+                  }`}
+                >
+                  {cardKeyInfo.daysRemaining > 0
+                    ? `${cardKeyInfo.daysRemaining}天后`
+                    : '已过期'}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

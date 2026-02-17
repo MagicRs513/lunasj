@@ -652,7 +652,7 @@ export class DbManager {
     );
 
     if (typeof (this.storage as any).getFullUserCardKey === 'function') {
-      const result = (this.storage as any).getFullUserCardKey(userName);
+      const result = await (this.storage as any).getFullUserCardKey(userName);
       console.log(
         'db.getUserCardKey - result from getFullUserCardKey:',
         result,

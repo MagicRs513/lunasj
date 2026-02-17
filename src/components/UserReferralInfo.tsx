@@ -51,7 +51,7 @@ export default function UserReferralInfo() {
     try {
       const [infoRes, configRes] = await Promise.all([
         fetch('/api/invitation/info'),
-        fetch('/api/admin/invitation-config'),
+        fetch('/api/invitation-config'),
       ]);
 
       if (!infoRes.ok) {

@@ -153,7 +153,16 @@ export class InvitationService {
 export class PointsService {
   // 获取用户积分余额
   static async getUserBalance(username: string): Promise<number> {
-    const userPoints = await db.getUserPoints(username);
+    let userPoints = await db.getUserPoints(username);
+
+    // 如果用户没有积分记录，自动创建一个
+    if (!userPoints) {
+      const { createUserPoints } = await import('./mysql/queries/points');
+      const code = generateInvitationCode();
+      await createUserPoints(username, code);
+      userPoints = await db.getUserPoints(username);
+    }
+
     return userPoints?.balance || 0;
   }
 
@@ -238,6 +247,12 @@ export class PointsService {
     page: number = 1,
     pageSize: number = 20,
   ): Promise<PointsRecord[]> {
+    // 确保用户有积分记录
+    const userPoints = await db.getUserPoints(username);
+    if (!userPoints) {
+      return [];
+    }
+
     return await db.getPointsHistory(username, page, pageSize);
   }
 
@@ -439,7 +454,16 @@ export class PointsService {
 
   // 获取用户积分详情
   static async getUserPointsInfo(username: string): Promise<UserPointsInfo> {
-    const points = await db.getUserPoints(username);
+    let points = await db.getUserPoints(username);
+
+    // 如果用户没有积分记录，自动创建一个
+    if (!points) {
+      const { createUserPoints } = await import('./mysql/queries/points');
+      const code = generateInvitationCode();
+      await createUserPoints(username, code);
+      points = await db.getUserPoints(username);
+    }
+
     return {
       username,
       balance: points?.balance || 0,

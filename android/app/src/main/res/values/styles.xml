@@ -15,6 +15,12 @@
         <item name="android:background">@null</item>
     </style>
 
+    <!-- Leanback theme for TV -->
+    <style name="AppTheme.Leanback" parent="Theme.Leanback">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>

@@ -5,6 +5,8 @@ const config: CapacitorConfig = {
   appName: 'LunaTV',
   webDir: 'public',
   server: {
+    // 加载远程 LunaTV 后端服务
+    url: 'https://lunatv.smone.us', // 替换为您的 LunaTV 后端地址
     androidScheme: 'https',
     cleartext: true,
     allowNavigation: ['*']
@@ -12,7 +14,7 @@ const config: CapacitorConfig = {
   android: {
     webContentsDebuggingEnabled: true,
     captureInput: true,
-    appendUserAgent: 'LunaTV-Android/1.0'
+    appendUserAgent: 'LunaTV-AndroidTV/1.0'
   },
   plugins: {
     SplashScreen: {
